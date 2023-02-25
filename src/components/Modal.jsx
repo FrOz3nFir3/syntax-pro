@@ -1,5 +1,5 @@
 import React from 'react';
-import {NewFolder, NewPlayground, EditTitle, NewPlayGroundAndFolder} from "./ModalTypes.jsx";
+import {NewFolder, NewPlayground, EditTitle, NewPlayGroundAndFolder, Load} from "./ModalTypes.jsx";
 
 function Modal(props) {
   const {toggle} = props;
@@ -18,6 +18,7 @@ function Modal(props) {
           {type == "newPlayground" && <NewPlayground modal={props.modal} toggle={toggle}/> }
           {type == "newFolder" && <NewFolder toggle={toggle}/> }
           {type.includes("edit") && <EditTitle modal={props.modal} toggle={toggle}/>}
+          {type.toLowerCase().includes("code") && <Load type={type}/>}
         </div>
       </div>
     </div>

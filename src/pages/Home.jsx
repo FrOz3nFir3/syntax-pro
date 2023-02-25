@@ -72,8 +72,8 @@ function Home(props) {
       return (
         <Link key={playgroundId} to={`/playground/${folderId}/${playgroundId}`}>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-black text-white p-3 hover:bg-white hover:text-black">
-            <div className="flex flex-wrap items-center justify-start gap-3">
+        <div className="flex flex-wrap items-center justify-center lg:justify-between r gap-4 bg-black text-white p-3 hover:bg-white hover:text-black h-full">
+            <div className="flex flex-wrap justify-center lg:justify-between  items-center justify-start gap-4">
               <img width={100} height={100} src={`/${playground.language}.png`} alt="logo" />
               <div>
                 <h3 className="text-2xl">Title: <strong>{playground.title}</strong></h3>

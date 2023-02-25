@@ -4,15 +4,17 @@ import {useDispatch} from "react-redux";
 import {addFolder, addPlayground,addPlaygroundAndFolder,editTitles} from "../slices/playgroundSlice.jsx";
 
 
-const options = [
+const languageOptions = [
   { value: 'javascript', label: 'Javascript' },
   { value: 'java', label: 'Java' },
   { value: 'python', label: 'Python' },
-  { value: 'cpp', label: 'C' },
+  { value: 'cpp', label: 'C++' },
+  { value: 'rust', label: "Rust"},
+  { value: 'php', label: "Php"}
 ];
 
 export function NewPlayGroundAndFolder(props) {
-  const [selectedOption, setSelectedOption] = React.useState(options[0]);
+  const [selectedOption, setSelectedOption] = React.useState(languageOptions[0]);
 
   const dispatch = useDispatch();
   const folderRef = React.createRef();
@@ -39,26 +41,28 @@ export function NewPlayGroundAndFolder(props) {
 
     <div className="flex flex-wrap gap-3 mt-4">
       <p>Folder Name</p>
-      <input className="border border-indigo-600" type="text" ref={folderRef}/>
+      <input className="input-primary" type="text" ref={folderRef}/>
     </div>
 
     <div className="flex flex-wrap gap-3 mt-4">
       <p>Card Name</p>
-      <input className="border border-indigo-600" type="text" ref={cardRef}/>
+      <input className="input-primary" type="text" ref={cardRef}/>
     </div>
 
     <div className="flex flex-wrap justify-between gap-3 mt-4">
-      <Select
-        defaultValue={selectedOption}
-        onChange={setSelectedOption}
-        options={options}
-      />
+      <div style={{minWidth:"150px"}}>
+        <Select
+          defaultValue={selectedOption}
+          onChange={setSelectedOption}
+          options={languageOptions}
+        />
+      </div>
       <button onClick={createPlaygroundAndFolder} className="btn-gold">Create Playground</button>
     </div>
   </div>
 }
 export function NewPlayground(props) {
-  const [selectedOption, setSelectedOption] = React.useState(options[0]);
+  const [selectedOption, setSelectedOption] = React.useState(languageOptions[0]);
 
   const {
     toggle
@@ -88,11 +92,13 @@ export function NewPlayground(props) {
     </div>
     <div className="flex flex-wrap gap-3 mt-4">
       <input className="border border-indigo-600" type="text" ref={inputRef}/>
-      <Select
-        defaultValue={selectedOption}
-        onChange={setSelectedOption}
-        options={options}
-      />
+      <div style={{minWidth:"150px"}}>
+        <Select
+          defaultValue={selectedOption}
+          onChange={setSelectedOption}
+          options={languageOptions}
+        />
+      </div>
     </div>
     <button onClick={createPlayground} className="btn-gold mt-4">Create Playground</button>
 
@@ -120,7 +126,7 @@ export  function NewFolder(props) {
     </div>
 
     <div className="flex flex-wrap gap-3 mt-4">
-      <input className="border border-indigo-600" type="text" ref={inputRef}/>
+      <input className="input-primary" type="text" ref={inputRef}/>
       <button className="btn-gold" onClick={createFolder}>Create Folder</button>
     </div>
   </div>
@@ -167,8 +173,18 @@ export function EditTitle(props) {
     </div>
 
     <div className="flex flex-wrap gap-3 mt-4">
-      <input className="border border-indigo-600" type="text" value={currentTitle} onChange={editTitle}/>
+      <input className="input-primary" type="text" value={currentTitle} onChange={editTitle}/>
       <button onClick={updateTitle} className="btn-gold">Update Title</button>
     </div>
+  </div>
+}
+
+export function Load(props) {
+  const {
+    type
+  } = props;
+
+  return <div className="p-4">
+    <h2 className="text-lg">{type}...</h2>
   </div>
 }
