@@ -217,7 +217,7 @@ function Playground(props) {
               />
               <button className="hover:bg-black hover:text-white" onClick={handleInputImport}>Import Input</button>
             </div>
-            <textarea className="w-full h-full lg:h-[80%] p-2" name="input" id="input-code" ref={codeInputRef}></textarea>
+            <textarea className="w-full h-[260px]  p-2" name="input" id="input-code" ref={codeInputRef}></textarea>
           </div>
 
           <div className="h-full">
@@ -225,7 +225,7 @@ function Playground(props) {
               <h2 className="font-bold text-xl">Output</h2>
               <button className="hover:bg-black hover:text-white" onClick={(e) => exportCodeFile(codeExportRef.current.innerText, title + '-output')}>Export Output</button>
             </div>
-            <div className="w-full h-full lg:h-[80%] p-2" ref={codeExportRef}></div>
+            <div style={{overflow:"auto"}} className="w-full h-[260px] p-2" ref={codeExportRef}></div>
           </div>
         </div>
       </div>
@@ -274,6 +274,11 @@ function Playground(props) {
       // }
 
       var details = await response.json();
+
+      //contains error
+      if(details.message){
+        throw details;
+      }
       var {
         stdout,
         stderr,
@@ -294,7 +299,9 @@ function Playground(props) {
         codeExportRef.current.innerText = stdout;
       }
     }catch(e){
-      codeExportRef.current.innerText = "Error from API / Network Request"
+      codeExportRef.current.innerText = `Error from API / Network Request:
+      Message: ${e.message}
+      `
     }
 
     // closing the modal
