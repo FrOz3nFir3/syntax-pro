@@ -26,6 +26,9 @@ import { foldGutter, codeFolding, bracketMatching } from "@codemirror/language";
 import { lineNumbers } from "@codemirror/view";
 import { closeBrackets, autocompletion } from "@codemirror/autocomplete";
 
+import Skeleton from "../skeletons/Skeleton";
+import { KEY, IS_TOUCH } from "../../utils/platform";
+
 // Lazy load ReactCodeMirror for better performance
 const ReactCodeMirror = lazy(() => import("@uiw/react-codemirror"));
 
@@ -60,30 +63,29 @@ const loadTheme = (theme) => {
   });
 };
 
-// Loading fallback component
+// Loading fallback — uses the shared Skeleton primitive for cohesion.
 const CodeEditorSkeleton = () => (
-  <div className="flex flex-col h-full bg-white dark:bg-gray-800 animate-pulse">
-    <div className="flex items-center justify-between px-4 py-2 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-      <div className="flex items-center space-x-2">
-        <div className="w-4 h-4 bg-gray-300 dark:bg-gray-600 rounded"></div>
-        <div className="w-20 h-4 bg-gray-300 dark:bg-gray-600 rounded"></div>
-        <div className="w-12 h-6 bg-gray-300 dark:bg-gray-600 rounded"></div>
+  <Skeleton.Group className="flex flex-col h-full bg-paper-50 dark:bg-ink-700">
+    <div className="flex items-center justify-between px-4 py-2.5 bg-paper dark:bg-ink-800 border-b border-ink/10 dark:border-paper/10">
+      <div className="flex items-center gap-3">
+        <Skeleton.Circle className="w-3 h-3" />
+        <Skeleton.Block className="w-28 h-4" />
+        <Skeleton.Block className="w-16 h-5" />
       </div>
-      <div className="flex items-center space-x-1">
-        <div className="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded"></div>
-        <div className="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded"></div>
-        <div className="w-16 h-8 bg-gray-300 dark:bg-gray-600 rounded"></div>
-      </div>
-    </div>
-    <div className="flex-1 p-4">
-      <div className="space-y-2">
-        <div className="w-full h-4 bg-gray-300 dark:bg-gray-600 rounded"></div>
-        <div className="w-3/4 h-4 bg-gray-300 dark:bg-gray-600 rounded"></div>
-        <div className="w-1/2 h-4 bg-gray-300 dark:bg-gray-600 rounded"></div>
-        <div className="w-5/6 h-4 bg-gray-300 dark:bg-gray-600 rounded"></div>
+      <div className="flex items-center gap-1">
+        <Skeleton.Block className="w-8 h-8 rounded-lg" />
+        <Skeleton.Block className="w-8 h-8 rounded-lg" />
+        <Skeleton.Block className="w-8 h-8 rounded-lg" />
+        <Skeleton.Block className="w-20 h-9 rounded-lg !bg-mustard/40" />
       </div>
     </div>
-  </div>
+    <div className="flex-1 p-5 space-y-2.5 bg-paper dark:bg-ink-700">
+      <Skeleton.Block className="h-3 w-1/3" />
+      <Skeleton.Block className="h-3 w-2/3" />
+      <Skeleton.Block className="h-3 w-1/2" />
+      <Skeleton.Block className="h-3 w-3/4" />
+    </div>
+  </Skeleton.Group>
 );
 
 const CodeEditor = memo(
@@ -115,6 +117,19 @@ const CodeEditor = memo(
     const [isLoading, setIsLoading] = useState(true);
     const editorRef = useRef(null);
     const fileInputRef = useRef(null);
+
+    // Keymap callbacks live in refs so the keymap extension can stay memo-stable
+    // while always calling the *latest* onRun / onSave handlers.
+    const onRunRef = useRef(onRun);
+    const onStopRef = useRef(onStop);
+    const onSaveRef = useRef(onSave);
+    const isRunningRef = useRef(isRunning);
+    useEffect(() => {
+      onRunRef.current = onRun;
+      onStopRef.current = onStop;
+      onSaveRef.current = onSave;
+      isRunningRef.current = isRunning;
+    }, [onRun, onStop, onSave, isRunning]);
 
     useEffect(() => {
       const loadDeps = async () => {
@@ -202,7 +217,27 @@ const CodeEditor = memo(
         bracketMatching(),
         closeBrackets(),
         autocompletion(),
-        keymap.of([...defaultKeymap, ...historyKeymap]),
+        keymap.of([
+          {
+            key: "Mod-Enter",
+            preventDefault: true,
+            run: () => {
+              if (isRunningRef.current) onStopRef.current?.();
+              else onRunRef.current?.();
+              return true;
+            },
+          },
+          {
+            key: "Mod-s",
+            preventDefault: true,
+            run: () => {
+              onSaveRef.current?.();
+              return true;
+            },
+          },
+          ...defaultKeymap,
+          ...historyKeymap,
+        ]),
         EditorState.allowMultipleSelections.of(true),
         // Enable proper scrolling behavior
         EditorView.theme({
@@ -232,77 +267,76 @@ const CodeEditor = memo(
 
     return (
       <div
-        className={`flex flex-col h-full bg-white dark:bg-slate-900 ${className}`}
+        className={`flex flex-col h-full bg-paper-50 dark:bg-ink-700 ${className}`}
       >
         {/* Toolbar */}
         {showToolbar && (
-          <div className="flex flex-wrap gap-4  items-center justify-between px-2 sm:px-4 py-2 bg-gray-50 dark:bg-slate-900 border-b border-gray-200 dark:border-neutral-600">
-            <div className="flex items-center space-x-1 sm:space-x-2 ">
-              <DocumentIcon className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-              <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300  max-w-20 sm:max-w-32">
+          <div className="flex flex-wrap gap-3 items-center justify-between px-3 sm:px-5 py-2.5 bg-paper dark:bg-ink-800 border-b border-ink/10 dark:border-paper/10">
+            {/* Title cluster */}
+            <div className="flex items-center gap-3 min-w-0">
+              {/* Functional save-status dot — replaces the skeuomorphic macOS dots */}
+              <SaveStatusDot
+                isSaving={isSaving}
+                lastSaved={lastSaved}
+                autoSaveEnabled={autoSaveEnabled}
+              />
+              <span className="font-display text-base sm:text-lg text-ink dark:text-paper truncate max-w-[12rem] sm:max-w-xs leading-none">
                 {title}
               </span>
-              <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-600 px-1 sm:px-2 py-0.5 sm:py-1 rounded uppercase">
+              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink/55 dark:text-paper/55 px-1.5 py-0.5 border border-ink/15 dark:border-paper/15 rounded">
                 {language}
               </span>
               {lastSaved && (
-                <span className="text-xs text-gray-500 dark:text-gray-400 hidden sm:inline">
-                  Saved {new Date(lastSaved).toLocaleTimeString()}
+                <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink/45 dark:text-paper/45 hidden md:inline">
+                  · saved {new Date(lastSaved).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                 </span>
               )}
             </div>
 
-            <div className="flex flex-wrap items-center gap-1  sm:flex-shrink-0">
-              <button
-                onClick={handleImportClick}
-                className="p-1 sm:p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
-                title="Import File (Ctrl+O)"
-              >
-                <DocumentArrowUpIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-              </button>
+            {/* Actions cluster */}
+            <div className="flex flex-wrap items-center gap-1 sm:flex-shrink-0">
+              <ToolIconButton onClick={handleImportClick} title="Import file (⌘O)">
+                <DocumentArrowUpIcon className="w-4 h-4" />
+              </ToolIconButton>
 
-              <button
-                onClick={handleExport}
-                className="p-1 sm:p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
-                title="Export File"
-              >
-                <DocumentArrowDownIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-              </button>
+              <ToolIconButton onClick={handleExport} title="Export file">
+                <DocumentArrowDownIcon className="w-4 h-4" />
+              </ToolIconButton>
 
-              <button
-                onClick={copyToClipboard}
-                className="p-1 sm:p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
-                title="Copy to Clipboard"
-              >
-                <DocumentDuplicateIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-              </button>
+              <ToolIconButton onClick={copyToClipboard} title="Copy to clipboard">
+                <DocumentDuplicateIcon className="w-4 h-4" />
+              </ToolIconButton>
 
               {/* Theme Dropdown */}
               <div className="relative theme-dropdown">
                 <button
                   onClick={() => setThemeDropdownVisible(!themeDropdownVisible)}
-                  className="flex items-center space-x-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
-                  title="Change Theme"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono uppercase tracking-[0.14em] text-ink/65 dark:text-paper/65 hover:text-ink dark:hover:text-paper hover:bg-ink/5 dark:hover:bg-paper/5 rounded-lg transition-colors"
+                  title="Change theme"
                 >
                   <span>Theme</span>
-                  <ChevronDownIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <ChevronDownIcon className={`w-3 h-3 transition-transform ${themeDropdownVisible ? "rotate-180" : ""}`} />
                 </button>
 
                 {themeDropdownVisible && (
-                  <div className="absolute top-full right-0 mt-1 w-48 bg-white dark:bg-slate-900 border border-gray-200 dark:border-neutral-600 rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
-                    {themeOptions.map((themeOption) => (
-                      <button
-                        key={themeOption.value}
-                        onClick={() => handleThemeChange(themeOption.value)}
-                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors ${
-                          theme === themeOption.value
-                            ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                            : "text-gray-700 dark:text-neutral-300"
-                        }`}
-                      >
-                        {themeOption.label}
-                      </button>
-                    ))}
+                  <div className="absolute top-full right-0 mt-1.5 w-52 bg-paper-50 dark:bg-ink-700 border border-ink/10 dark:border-paper/10 rounded-xl shadow-lift z-50 max-h-72 overflow-y-auto py-1.5 animate-fade-in">
+                    {themeOptions.map((themeOption) => {
+                      const active = theme === themeOption.value;
+                      return (
+                        <button
+                          key={themeOption.value}
+                          onClick={() => handleThemeChange(themeOption.value)}
+                          className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center justify-between ${
+                            active
+                              ? "text-ink dark:text-paper font-medium"
+                              : "text-ink/70 dark:text-paper/70 hover:bg-ink/5 dark:hover:bg-paper/5"
+                          }`}
+                        >
+                          <span>{themeOption.label}</span>
+                          {active && <span className="w-1.5 h-1.5 rounded-full bg-signal" />}
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -311,39 +345,37 @@ const CodeEditor = memo(
               {toggleAutoSave && (
                 <button
                   onClick={toggleAutoSave}
-                  className={`flex items-center space-x-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded transition-colors ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono uppercase tracking-[0.14em] rounded-lg transition-colors ${
                     autoSaveEnabled
-                      ? "bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/30"
-                      : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600"
+                      ? "bg-mint-100 text-mint-400 dark:bg-mint-400/15 dark:text-mint-200"
+                      : "text-ink/55 dark:text-paper/55 hover:bg-ink/5 dark:hover:bg-paper/5"
                   }`}
-                  title={`Auto-save is ${
-                    autoSaveEnabled ? "enabled" : "disabled"
-                  }`}
+                  title={`Auto-save is ${autoSaveEnabled ? "on" : "off"}`}
                 >
-                  <ClockIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <ClockIcon className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Auto</span>
                 </button>
               )}
 
-              <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+              <div className="w-px h-5 bg-ink/15 dark:bg-paper/15 mx-1" />
 
               {onSave && (
                 <button
                   onClick={onSave}
                   disabled={isSaving}
-                  className={`flex items-center space-x-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded transition-colors ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
                     isSaving
-                      ? "bg-blue-400 text-blue-100 cursor-not-allowed"
-                      : "bg-blue-600 hover:bg-blue-700 text-white"
+                      ? "bg-ink/8 text-ink/45 cursor-not-allowed dark:bg-paper/8 dark:text-paper/45"
+                      : "text-ink/75 hover:text-ink hover:bg-ink/5 dark:text-paper/75 dark:hover:text-paper dark:hover:bg-paper/5"
                   }`}
-                  title="Save (Ctrl+S)"
+                  title={`Save (${KEY.save})`}
                 >
                   {isSaving ? (
-                    <ArrowPathIcon className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                    <ArrowPathIcon className="w-4 h-4 animate-spin" />
                   ) : (
-                    <CheckIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <CheckIcon className="w-4 h-4" />
                   )}
-                  <span>{isSaving ? "Saving..." : "Save"}</span>
+                  <span className="hidden sm:inline">{isSaving ? "Saving" : "Save"}</span>
                 </button>
               )}
 
@@ -352,19 +384,37 @@ const CodeEditor = memo(
                   {!isRunning ? (
                     <button
                       onClick={onRun}
-                      className="flex items-center space-x-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded transition-colors bg-green-600 hover:bg-green-700 text-white"
-                      title="Run Code (Ctrl+Enter)"
+                      className="
+                        flex items-center gap-2 px-4 sm:px-5 py-2 text-sm font-semibold rounded-lg
+                        bg-mustard text-ink border border-mustard-500
+                        shadow-press hover:shadow-lift hover:bg-mustard-300
+                        hover:-translate-y-px active:translate-y-0
+                        transition-all duration-150
+                        dark:shadow-press-dark
+                      "
+                      title={`Run code (${KEY.run})`}
                     >
-                      <PlayIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <PlayIcon className="w-4 h-4" />
                       <span>Run</span>
+                      {!IS_TOUCH && (
+                        <kbd className="hidden lg:inline font-mono text-[10px] tracking-normal text-ink/55 px-1.5 py-0.5 rounded border border-ink/20 leading-none">
+                          {KEY.run}
+                        </kbd>
+                      )}
                     </button>
                   ) : (
                     <button
                       onClick={onStop}
-                      className="flex items-center space-x-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded transition-colors bg-red-600 hover:bg-red-700 text-white"
-                      title="Stop Execution"
+                      className="
+                        flex items-center gap-2 px-4 sm:px-5 py-2 text-sm font-semibold rounded-lg
+                        bg-signal text-paper border border-signal-500
+                        shadow-soft hover:shadow-lift hover:bg-signal-500
+                        hover:-translate-y-px active:translate-y-0
+                        transition-all duration-150
+                      "
+                      title="Stop execution"
                     >
-                      <StopIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <StopIcon className="w-4 h-4" />
                       <span>Stop</span>
                     </button>
                   )}
@@ -405,5 +455,59 @@ const CodeEditor = memo(
 );
 
 CodeEditor.displayName = "CodeEditor";
+
+const ToolIconButton = ({ onClick, title, children }) => (
+  <button
+    onClick={onClick}
+    title={title}
+    className="p-2 text-ink/65 hover:text-ink hover:bg-ink/5 dark:text-paper/65 dark:hover:text-paper dark:hover:bg-paper/5 rounded-lg transition-colors"
+  >
+    {children}
+  </button>
+);
+
+/**
+ * Live save-status dot.
+ *  - mustard pulse  → currently saving
+ *  - mint solid     → saved (last save < 5s ago)
+ *  - mint ring      → saved (older), auto-save on
+ *  - ink/40 ring    → never saved / auto-save off
+ */
+const SaveStatusDot = ({ isSaving, lastSaved, autoSaveEnabled }) => {
+  const recentlySaved = lastSaved && Date.now() - new Date(lastSaved).getTime() < 5000;
+
+  let label = "ready";
+  let dot = (
+    <span className="block w-2.5 h-2.5 rounded-full border border-ink/40 dark:border-paper/40" />
+  );
+
+  if (isSaving) {
+    label = "saving…";
+    dot = (
+      <span className="relative block w-2.5 h-2.5">
+        <span className="absolute inset-0 rounded-full bg-mustard animate-ping opacity-60" />
+        <span className="relative block w-2.5 h-2.5 rounded-full bg-mustard" />
+      </span>
+    );
+  } else if (recentlySaved) {
+    label = "saved";
+    dot = <span className="block w-2.5 h-2.5 rounded-full bg-mint-400" />;
+  } else if (lastSaved) {
+    label = autoSaveEnabled ? "auto-save on" : "saved";
+    dot = (
+      <span className="block w-2.5 h-2.5 rounded-full border-[1.5px] border-mint-400" />
+    );
+  }
+
+  return (
+    <span
+      className="inline-flex items-center justify-center w-4 h-4"
+      title={label}
+      aria-label={label}
+    >
+      {dot}
+    </span>
+  );
+};
 
 export default CodeEditor;

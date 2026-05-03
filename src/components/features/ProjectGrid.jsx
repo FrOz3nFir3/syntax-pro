@@ -157,26 +157,16 @@ const ProjectGrid = memo(
           <div className="flex flex-col gap-4 mb-6">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
               <div className="flex-1">
-                <h1
-                  className={`
-                  ${typography.h1} font-bold mb-2
-                  text-neutral-900 dark:text-neutral-100
-                `}
-                >
+                <p className="eyebrow mb-3">Your workspace</p>
+                <h1 className="heading-display text-4xl sm:text-5xl text-ink dark:text-paper mb-2">
                   My Playgrounds
                 </h1>
-                <p
-                  className={`
-                  ${typography.body}
-                  text-neutral-600 dark:text-neutral-400
-                `}
-                >
+                <p className="font-mono text-xs uppercase tracking-[0.18em] text-ink/55 dark:text-paper/55">
                   {totalPlaygrounds}{" "}
-                  {totalPlaygrounds === 1 ? "playground" : "playgrounds"} across{" "}
+                  {totalPlaygrounds === 1 ? "playground" : "playgrounds"}
+                  <span className="mx-2 text-ink/25 dark:text-paper/25">/</span>
                   {Object.keys(folders || {}).length}{" "}
-                  {Object.keys(folders || {}).length === 1
-                    ? "folder"
-                    : "folders"}
+                  {Object.keys(folders || {}).length === 1 ? "folder" : "folders"}
                 </p>
               </div>
 
@@ -226,18 +216,18 @@ const ProjectGrid = memo(
               </div>
             </div>
 
-            {/*  Filter Toggle */}
+            {/* Filter Toggle — tightened to a pill, not a full-width row */}
             {!hasNoFolders && (
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className="
-                flex items-center justify-center gap-2 px-4 py-3 rounded-lg border transition-colors
-                bg-neutral-50 border-neutral-200 text-neutral-600 hover:bg-neutral-100
-                dark:bg-slate-800 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-700
+                self-start inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border transition-colors font-mono text-[11px] uppercase tracking-[0.16em]
+                bg-transparent border-ink/15 text-ink/65 hover:bg-ink/5 hover:text-ink hover:border-ink/30
+                dark:border-paper/15 dark:text-paper/65 dark:hover:bg-paper/5 dark:hover:text-paper dark:hover:border-paper/30
               "
               >
                 <svg
-                  className="w-5 h-5"
+                  className="w-3.5 h-3.5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -249,9 +239,9 @@ const ProjectGrid = memo(
                     d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"
                   />
                 </svg>
-                {showFilters ? "Hide Filters" : "Show Filters"}
+                {showFilters ? "Hide filters" : "Show filters"}
                 <svg
-                  className={`w-4 h-4 transition-transform ${
+                  className={`w-3 h-3 transition-transform ${
                     showFilters ? "rotate-180" : ""
                   }`}
                   fill="none"
@@ -273,8 +263,7 @@ const ProjectGrid = memo(
           {!hasNoFolders && showFilters && (
             <div
               className={`
-              ${spacing.card} rounded-xl border transition-all duration-300
-              bg-neutral-50 border-neutral-200 dark:bg-slate-800 dark:border-neutral-700
+              pt-5 transition-all duration-300
               ${isSmallScreen ? "animate-fade-in" : ""}
             `}
             >
@@ -336,7 +325,7 @@ const ProjectGrid = memo(
               </div>
 
               {/* Additional Filters */}
-              <div className="flex flex-wrap items-center gap-4 mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700">
+              <div className="flex flex-wrap items-center gap-4 mt-5 pt-4 border-t border-ink/10 dark:border-paper/10">
                 <button
                   onClick={() => setShowFavorites(!showFavorites)}
                   className={`
@@ -344,8 +333,8 @@ const ProjectGrid = memo(
                   transition-colors duration-200
                   ${
                     showFavorites
-                      ? "bg-yellow-100 text-yellow-700 border border-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-700"
-                      : "text-neutral-600 hover:text-neutral-700 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:text-neutral-300 dark:hover:bg-neutral-700"
+                      ? "bg-mustard/20 text-mustard-700 border border-mustard-300 dark:bg-mustard/15 dark:text-mustard-200 dark:border-mustard/40"
+                      : "text-ink/65 hover:text-ink hover:bg-ink/5 dark:text-paper/65 dark:hover:text-paper dark:hover:bg-paper/5"
                   }
                 `}
                 >
@@ -369,18 +358,11 @@ const ProjectGrid = memo(
                 {(searchQuery ||
                   selectedLanguage !== "all" ||
                   showFavorites) && (
-                  <span
-                    className="
-                    text-sm
-                    text-neutral-600 dark:text-neutral-400
-                  "
-                  >
-                    Showing {filteredPlaygroundCount} of {totalPlaygrounds}{" "}
-                    playgrounds
+                  <span className="font-mono text-xs uppercase tracking-[0.14em] text-ink/55 dark:text-paper/55">
+                    Showing {filteredPlaygroundCount} / {totalPlaygrounds}
                   </span>
                 )}
 
-                {/* Clear Filters */}
                 {(searchQuery ||
                   selectedLanguage !== "all" ||
                   showFavorites) && (
@@ -390,11 +372,7 @@ const ProjectGrid = memo(
                       setSelectedLanguage("all");
                       setShowFavorites(false);
                     }}
-                    className="
-                    text-sm font-medium transition-colors duration-200
-                    text-blue-600 hover:text-blue-700
-                    dark:text-blue-400 dark:hover:text-blue-300
-                  "
+                    className="text-sm font-medium transition-colors duration-200 text-signal hover:text-signal-500"
                   >
                     Clear Filters
                   </button>
@@ -406,45 +384,16 @@ const ProjectGrid = memo(
 
         {/* Content */}
         {hasNoFolders ? (
-          /* Empty State - No Folders */
-          <div className="text-center py-16">
-            <div
-              className="
-              w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center
-              bg-neutral-100 text-neutral-500
-              dark:bg-neutral-800 dark:text-neutral-400
-            "
-            >
-              <svg
-                className="w-12 h-12"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-                />
-              </svg>
-            </div>
-            <h2
-              className="
-              text-2xl font-bold mb-4
-              text-neutral-800 dark:text-neutral-200
-            "
-            >
-              Welcome to Syntax Pro
+          <div className="text-center py-20 relative">
+            <span aria-hidden className="absolute top-0 left-1/2 -translate-x-24 w-10 h-10 border-t-2 border-l-2 border-signal/40" />
+            <span aria-hidden className="absolute bottom-8 left-1/2 translate-x-14 w-10 h-10 border-b-2 border-r-2 border-signal/40" />
+            <p className="eyebrow mb-4">A blank slate</p>
+            <h2 className="heading-display text-4xl text-ink dark:text-paper mb-4">
+              Welcome to Syntax<span className="text-signal">.</span>Pro
             </h2>
-            <p
-              className="
-              text-lg mb-8 max-w-md mx-auto
-              text-neutral-600 dark:text-neutral-400
-            "
-            >
-              Start your coding journey by creating your first playground or
-              organizing your projects with folders.
+            <p className="text-ink/65 dark:text-paper/65 mb-10 max-w-md mx-auto">
+              Make your first playground, or set up a folder to keep things
+              organized. Either works — there's no wrong order.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="primary" onClick={() => onCreatePlayground()}>
@@ -482,45 +431,13 @@ const ProjectGrid = memo(
             </div>
           </div>
         ) : hasNoResults ? (
-          /* Empty State - No Search Results */
           <div className="text-center py-16">
-            <div
-              className="
-              w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center
-              bg-neutral-100 text-neutral-500
-              dark:bg-neutral-800 dark:text-neutral-400
-            "
-            >
-              <svg
-                className="w-10 h-10"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
-            <h3
-              className="
-              text-xl font-semibold mb-3
-              text-neutral-800 dark:text-neutral-200
-            "
-            >
-              No playgrounds found
+            <p className="eyebrow mb-3">No matches</p>
+            <h3 className="heading-display text-3xl text-ink dark:text-paper mb-3">
+              Nothing here
             </h3>
-            <p
-              className="
-              mb-6
-              text-neutral-600 dark:text-neutral-400
-            "
-            >
-              Try adjusting your search terms or filters to find what you're
-              looking for.
+            <p className="text-ink/65 dark:text-paper/65 mb-8 max-w-sm mx-auto">
+              Loosen your search or filters and try again.
             </p>
             <Button
               variant="secondary"

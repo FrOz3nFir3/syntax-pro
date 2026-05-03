@@ -1,26 +1,23 @@
 import React from "react";
+import Skeleton from "./Skeleton";
 
-const NotFoundSkeleton = () => {
-  return (
-    <div className="animate-pulse flex items-center justify-center min-h-[60vh]">
-      <div className="text-center max-w-md mx-auto px-4">
-        {/* Large number skeleton */}
-        <div className="h-32 bg-gray-300 dark:bg-gray-600 rounded-lg mb-8 max-w-48 mx-auto"></div>
-
-        {/* Title skeleton */}
-        <div className="h-8 bg-gray-300 dark:bg-gray-600 rounded-lg mb-4 max-w-64 mx-auto"></div>
-
-        {/* Description skeleton */}
-        <div className="space-y-2 mb-8">
-          <div className="h-5 bg-gray-300 dark:bg-gray-600 rounded max-w-80 mx-auto"></div>
-          <div className="h-5 bg-gray-300 dark:bg-gray-600 rounded max-w-60 mx-auto"></div>
+const NotFoundSkeleton = () => (
+  <div className="min-h-screen flex flex-col items-center justify-center bg-paper dark:bg-ink-800 px-4">
+    <Skeleton.Group className="max-w-lg w-full">
+      <div className="text-center px-8 py-14 bg-paper-50 dark:bg-ink-700 border border-ink/10 dark:border-paper/10 rounded-2xl shadow-soft space-y-5">
+        <Skeleton.Block className="h-3 w-32 mx-auto" />
+        <Skeleton.Block className="h-14 w-3/4 mx-auto" />
+        <div className="space-y-2 max-w-sm mx-auto pt-2">
+          <Skeleton.Block className="h-4 w-full" />
+          <Skeleton.Block className="h-4 w-2/3 mx-auto" />
         </div>
-
-        {/* Button skeleton */}
-        <div className="h-12 w-40 bg-gray-300 dark:bg-gray-600 rounded-lg mx-auto"></div>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
+          <Skeleton.Block className="h-11 w-32 rounded-xl" />
+          <Skeleton.Block className="h-11 w-40 rounded-xl" />
+        </div>
       </div>
-    </div>
-  );
-};
+    </Skeleton.Group>
+  </div>
+);
 
 export default NotFoundSkeleton;

@@ -129,7 +129,7 @@ const PlaygroundContent = memo(
 
     return (
       <div
-        className={`flex flex-col bg-gray-50 dark:bg-neutral-900 ${
+        className={`flex flex-col bg-paper dark:bg-ink-800 ${
           isFullscreen
             ? "fixed inset-0 z-50 h-screen"
             : "h-[100dvh] sm:h-[calc(100vh-4rem)]"
@@ -456,14 +456,12 @@ const EnhancedPlayground = () => {
       <AppLayout>
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+            <p className="eyebrow mb-3">404 · playground</p>
+            <h2 className="heading-display text-4xl text-ink dark:text-paper mb-4">
               Playground not found
             </h2>
-            <Link
-              to="/playgrounds"
-              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
-            >
-              Return to Playgrounds
+            <Link to="/playgrounds" className="btn-outline">
+              Return to playgrounds
             </Link>
           </div>
         </div>
@@ -505,7 +503,7 @@ const EnhancedPlayground = () => {
     <PlaygroundContent {...contentProps} />
   ) : (
     <AppLayout
-      className="bg-gray-50 dark:bg-neutral-900"
+      className="bg-paper dark:bg-ink-800"
       noPadding
       showBreadcrumbs={false}
     >

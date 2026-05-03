@@ -38,18 +38,17 @@ const Input = ({
 
   const stateClasses = {
     default: `
-      border-gray-300 focus:border-blue-500 focus:ring-blue-500 focus:shadow-lg focus:shadow-blue-500/10
-      dark:border-gray-600 dark:focus:border-blue-400 dark:focus:ring-blue-400
-      hover:border-gray-400 dark:hover:border-gray-500
+      border-ink/15 focus:border-ink focus:ring-mustard/40
+      dark:border-paper/15 dark:focus:border-paper
+      hover:border-ink/30 dark:hover:border-paper/30
     `,
     error: `
-      border-red-500 focus:border-red-500 focus:ring-red-500 focus:shadow-lg focus:shadow-red-500/10
-      dark:border-red-400 dark:focus:border-red-400 dark:focus:ring-red-400
+      border-signal focus:border-signal focus:ring-signal/30
+      dark:border-signal-300 dark:focus:border-signal-300
       animate-shake
     `,
     success: `
-      border-green-500 focus:border-green-500 focus:ring-green-500 focus:shadow-lg focus:shadow-green-500/10
-      dark:border-green-400 dark:focus:border-green-400 dark:focus:ring-green-400
+      border-mint-400 focus:border-mint-400 focus:ring-mint/40
     `,
   };
 
@@ -60,8 +59,8 @@ const Input = ({
   };
 
   const backgroundClasses = disabled
-    ? "bg-gray-100 cursor-not-allowed dark:bg-gray-800"
-    : "bg-white dark:bg-gray-900";
+    ? "bg-paper-200 cursor-not-allowed dark:bg-ink-700"
+    : "bg-paper-50 shadow-[inset_0_1px_0_rgba(11,23,51,0.04)] dark:bg-ink-800 dark:shadow-none";
 
   const inputClasses = `
     ${baseClasses} ${getStateClass()} ${backgroundClasses}
@@ -85,11 +84,11 @@ const Input = ({
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          className="block text-sm font-medium text-ink/80 dark:text-paper/80 mb-2"
         >
           {label}
           {required && (
-            <span className="text-red-500 ml-1" aria-label="required">
+            <span className="text-signal ml-1" aria-label="required">
               *
             </span>
           )}
@@ -103,7 +102,7 @@ const Input = ({
               isTouchDevice ? "pl-4" : "pl-3"
             } flex items-center pointer-events-none`}
           >
-            <span className="text-gray-400 dark:text-gray-500">{icon}</span>
+            <span className="text-ink/40 dark:text-paper/40">{icon}</span>
           </div>
         )}
 

@@ -68,8 +68,8 @@ const FolderSection = memo(
           {/* Folder Header */}
           <div
             className={`
-            flex items-center justify-between p-4 rounded-t-xl border-b bg-neutral-50 border-neutral-200 dark:bg-gray-900 dark:border-gray-800
-            ${isCollapsed ? "rounded-b-xl border-b-0" : ""}
+            flex items-center justify-between p-4 rounded-t-2xl border bg-paper-50 border-ink/10 dark:bg-ink-700 dark:border-paper/10
+            ${isCollapsed ? "rounded-b-2xl" : "border-b-0"}
           `}
           >
             <div className="flex items-center gap-3">
@@ -78,8 +78,8 @@ const FolderSection = memo(
                 onClick={() => setIsCollapsed(!isCollapsed)}
                 className="
                 p-2 rounded-lg transition-all duration-200
-                hover:bg-neutral-200 text-neutral-600
-                dark:hover:bg-neutral-700 dark:text-neutral-300
+                hover:bg-ink/5 text-ink/65 hover:text-ink
+                dark:hover:bg-paper/5 dark:text-paper/65 dark:hover:text-paper
               "
                 aria-label={isCollapsed ? "Expand folder" : "Collapse folder"}
               >
@@ -102,35 +102,17 @@ const FolderSection = memo(
 
               {/* Folder Icon and Title */}
               <div className="flex items-center gap-3">
-                <div
-                  className="
-                  p-2 rounded-lg bg-yellow-100 text-yellow-600 dark:bg-neutral-700 dark:text-yellow-400
-                "
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                <div className="p-2 rounded-lg bg-mustard/20 text-mustard-700 dark:bg-mustard/15 dark:text-mustard-200">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2h-8l-2-2z" />
                   </svg>
                 </div>
 
                 <div>
-                  <h3
-                    className="
-                    text-lg font-semibold
-                    text-neutral-900 dark:text-neutral-100
-                  "
-                  >
+                  <h3 className="font-display text-xl text-ink dark:text-paper tracking-tight">
                     {folder.title}
                   </h3>
-                  <p
-                    className="
-                    text-sm
-                    text-neutral-500 dark:text-neutral-400
-                  "
-                  >
+                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink/55 dark:text-paper/55">
                     {playgroundCount}{" "}
                     {playgroundCount === 1 ? "playground" : "playgrounds"}
                   </p>
@@ -190,8 +172,8 @@ const FolderSection = memo(
                 <button
                   className="
                   p-2 rounded-lg transition-colors duration-200
-                  hover:bg-neutral-200 text-neutral-600
-                  dark:hover:bg-neutral-700 dark:text-neutral-300
+                  hover:bg-ink/5 text-ink/55 hover:text-ink
+                  dark:hover:bg-paper/5 dark:text-paper/55 dark:hover:text-paper
                 "
                   title="Folder options"
                 >
@@ -213,19 +195,19 @@ const FolderSection = memo(
                 {/* Dropdown Menu */}
                 <div
                   className="
-                  absolute right-0 top-full mt-1 w-40 py-1 rounded-lg shadow-lg border z-20
+                  absolute right-0 top-full mt-1 w-44 py-2 rounded-xl shadow-lift z-20
                   opacity-0 invisible group-hover:opacity-100 group-hover:visible
                   transition-all duration-200 origin-top-right
-                  bg-white border-neutral-200
-                  dark:bg-neutral-800 dark:border-neutral-700
+                  bg-paper-50 border border-ink/10
+                  dark:bg-ink-700 dark:border-paper/10
                 "
                 >
                   <button
                     onClick={() => onEditFolder(folderId, folder.title)}
                     className="
-                    w-full px-3 py-2 text-left text-sm transition-colors duration-200
-                    text-neutral-700 hover:bg-neutral-50
-                    dark:text-neutral-300 dark:hover:bg-neutral-700
+                    w-full px-4 py-2.5 text-left text-sm transition-colors duration-200
+                    text-ink/80 hover:bg-ink/5
+                    dark:text-paper/80 dark:hover:bg-paper/5
                   "
                   >
                     <svg
@@ -246,9 +228,9 @@ const FolderSection = memo(
                   <button
                     onClick={() => setShowDeleteConfirm(true)}
                     className="
-                    w-full px-3 py-2 text-left text-sm transition-colors duration-200
-                    text-red-500 hover:bg-red-50
-                    dark:hover:bg-red-900/20
+                    w-full px-4 py-2.5 text-left text-sm transition-colors duration-200
+                    text-signal-500 hover:bg-signal-50
+                    dark:text-signal-200 dark:hover:bg-signal/10
                   "
                   >
                     <svg
@@ -281,56 +263,23 @@ const FolderSection = memo(
             <div
               className="
               p-4 sm:p-6
-              bg-white dark:bg-neutral-800/50
-              rounded-b-xl border-l border-r border-b
-              border-neutral-200 dark:border-neutral-700
+              bg-paper dark:bg-ink-800
+              rounded-b-2xl border border-t-0 border-ink/10 dark:border-paper/10
             "
             >
               {playgroundCount === 0 ? (
-                /* Empty State */
-                <div className="text-center py-12">
-                  <div
-                    className="
-                    w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center
-                    bg-neutral-100 text-neutral-500
-                    dark:bg-neutral-700 dark:text-neutral-400
-                  "
-                  >
-                    <svg
-                      className="w-8 h-8"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                      />
-                    </svg>
-                  </div>
-                  <h4
-                    className="
-                    text-lg font-medium mb-2
-                    text-neutral-700 dark:text-neutral-300
-                  "
-                  >
+                <div className="text-center py-10">
+                  <p className="font-mono text-xs uppercase tracking-[0.18em] text-ink/45 dark:text-paper/45 mb-2">
+                    Empty folder
+                  </p>
+                  <h4 className="font-display text-2xl text-ink dark:text-paper mb-3">
                     No playgrounds yet
                   </h4>
-                  <p
-                    className="
-                    text-sm mb-4
-                    text-neutral-500 dark:text-neutral-400
-                  "
-                  >
-                    Create your first playground to start coding
+                  <p className="text-sm text-ink/55 dark:text-paper/55 mb-6 max-w-xs mx-auto">
+                    Add your first playground here to get started.
                   </p>
-                  <Button
-                    variant="primary"
-                    onClick={() => onCreatePlayground(folderId)}
-                  >
-                    Create Playground
+                  <Button variant="primary" onClick={() => onCreatePlayground(folderId)}>
+                    Create playground
                   </Button>
                 </div>
               ) : (

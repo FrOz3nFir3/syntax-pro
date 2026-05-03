@@ -9,7 +9,8 @@ import { useTheme } from "../../contexts/ThemeContext";
 import SyntaxProLogo from "../svg/SyntaxProLogo";
 
 const Header = ({ customActions = null, className = "" }) => {
-  const { toggleTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === "dark";
 
   const { isTouchDevice } = useTouchDevice();
   const touchClasses = getTouchFriendlyClasses(isTouchDevice);
@@ -17,245 +18,153 @@ const Header = ({ customActions = null, className = "" }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Focus trap for mobile menu
   const mobileMenuRef = useFocusTrap(mobileMenuOpen);
 
-  // Keyboard shortcuts
   useKeyboardShortcuts({
     "alt+h": () => navigate("/"),
     escape: () => mobileMenuOpen && closeMobileMenu(),
   });
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
+  const toggleMobileMenu = () => setMobileMenuOpen((p) => !p);
+  const closeMobileMenu = () => setMobileMenuOpen(false);
 
-  const closeMobileMenu = () => {
-    setMobileMenuOpen(false);
-  };
-
-  // Close mobile menu on route change
   useEffect(() => {
     closeMobileMenu();
   }, [location.pathname]);
 
-  // Close mobile menu on escape key
-  useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === "Escape" && mobileMenuOpen) {
-        closeMobileMenu();
-      }
-    };
-
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [mobileMenuOpen]);
+  const navItems = [
+    { to: "/", label: "Home" },
+    { to: "/playgrounds", label: "Playgrounds" },
+  ];
 
   return (
     <header
       className={`
         fixed top-0 left-0 right-0 z-50
-        bg-white/95 border-neutral-200 dark:bg-slate-800 dark:border-neutral-700
-        backdrop-blur-sm border-b transition-colors duration-300
+        bg-paper-50/90 dark:bg-ink-900/90
+        backdrop-blur-md backdrop-saturate-150
+        border-b border-ink/15 dark:border-paper/15
+        shadow-[0_1px_0_rgba(11,23,51,0.02)]
+        transition-colors duration-300
         ${className}
       `}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo and Brand */}
-          <div className="flex items-center space-x-4">
-            <Link
-              to="/"
-              className="flex items-center space-x-3 hover:opacity-80 transition-all duration-200 hover:scale-105 group"
-              onClick={closeMobileMenu}
-            >
-              <SyntaxProLogo />
+          {/* Brand */}
+          <Link
+            to="/"
+            className="flex items-center gap-3 group"
+            onClick={closeMobileMenu}
+            aria-label="Syntax Pro home"
+          >
+            <span className="relative inline-flex w-9 h-9 items-center justify-center rounded-lg overflow-hidden">
+              <SyntaxProLogo width={34} height={34} />
               <span
-                className="
-                text-xl font-bold transition-all duration-200
-                text-gray-900 dark:text-white
-                hidden sm:block
-              "
-              >
-                Syntax Pro
+                aria-hidden
+                className="absolute -top-1 -right-1 w-2 h-2 border-t-2 border-r-2 border-signal opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              />
+              <span
+                aria-hidden
+                className="absolute -bottom-1 -left-1 w-2 h-2 border-b-2 border-l-2 border-signal opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              />
+            </span>
+            <span className="hidden sm:flex flex-col leading-none">
+              <span className="font-display text-xl text-ink dark:text-paper tracking-tightest">
+                Syntax<span className="text-signal">.</span>Pro
               </span>
-            </Link>
-          </div>
+              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink/45 dark:text-paper/45 mt-0.5">
+                Code · Run · Save
+              </span>
+            </span>
+          </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-4 lg:space-x-6">
-            {/* Navigation Links */}
-            <nav className="flex items-center space-x-6">
-              <Link
-                to="/"
-                className={`
-                  text-sm font-medium transition-colors hover:text-blue-500
-                  ${
-                    location.pathname === "/"
-                      ? "text-blue-500"
-                      : "text-neutral-600 dark:text-neutral-300"
-                  }
-                `}
-              >
-                Home
-              </Link>
-              <Link
-                to="/playgrounds"
-                className={`
-                  text-sm font-medium transition-colors hover:text-blue-500
-                  ${
-                    location.pathname === "/playgrounds"
-                      ? "text-blue-500"
-                      : "text-neutral-600 dark:text-neutral-300"
-                  }
-                `}
-              >
-                Playgrounds
-              </Link>
+          {/* Desktop nav */}
+          <div className="hidden md:flex items-center gap-8">
+            <nav className="flex items-center gap-7">
+              {navItems.map((item) => {
+                const active = location.pathname === item.to;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className={active ? "nav-link-active" : "nav-link"}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
             </nav>
 
-            {/* User Actions */}
-            <div className="flex items-center space-x-2 lg:space-x-4">
-              {/* Theme Toggle */}
-              <button
-                className={`
-                  ${touchClasses.iconButton} rounded-lg transition-all duration-200
-                  hover:scale-110 hover:rotate-12 active:scale-95
-                  hover:bg-neutral-100 text-neutral-600 hover:shadow-lg hover:shadow-blue-500/20
-                  dark:hover:bg-neutral-800 dark:text-neutral-300 dark:hover:shadow-yellow-500/20
-                `}
-                aria-label="Toggle theme"
-                title="Toggle theme"
-                onClick={toggleTheme}
-              >
-                <svg
-                  className="w-5 h-5 hidden dark:block"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
-                </svg>
-                <svg
-                  className="w-5 h-5 dark:hidden"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                  />
-                </svg>
-              </button>
-
-              {/* Custom Actions */}
+            <div className="flex items-center gap-2">
+              <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
               {customActions}
             </div>
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden">
+          {/* Mobile */}
+          <div className="md:hidden flex items-center gap-1">
+            <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
             <button
               onClick={toggleMobileMenu}
-              className={`
-                ${touchClasses.iconButton} rounded-lg transition-colors
-                hover:bg-neutral-100 text-neutral-600
-                dark:hover:bg-neutral-800 dark:text-neutral-300
-              `}
-              aria-label="Toggle mobile menu"
+              className={`${touchClasses.iconButton} rounded-lg text-ink/70 dark:text-paper/70 hover:bg-ink/5 dark:hover:bg-paper/5 transition-colors`}
+              aria-label="Toggle menu"
               aria-expanded={mobileMenuOpen}
             >
-              {mobileMenuOpen ? (
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                {mobileMenuOpen ? (
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth={2}
                     d="M6 18L18 6M6 6l12 12"
                   />
-                </svg>
-              ) : (
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                ) : (
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
+                    d="M4 7h16M4 12h16M4 17h16"
                   />
-                </svg>
-              )}
+                )}
+              </svg>
             </button>
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile drawer */}
         {mobileMenuOpen && (
           <div
             ref={mobileMenuRef}
-            className="
-            md:hidden border-t animate-fade-in
-            border-neutral-200 bg-white
-            dark:border-neutral-700 dark:bg-neutral-900
-          "
+            className="md:hidden border-t border-ink/8 dark:border-paper/8 animate-fade-in"
             role="navigation"
-            aria-label="Mobile navigation menu"
           >
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              {/* Mobile Navigation Links */}
-              <Link
-                to="/"
-                onClick={closeMobileMenu}
-                className={`
-                  block px-4 py-3 rounded-md text-base font-medium transition-colors
-                  min-h-touch flex items-center
-                  ${
-                    location.pathname === "/"
-                      ? "text-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                      : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-neutral-800"
-                  }
-                `}
-              >
-                Home
-              </Link>
-
-              <Link
-                to="/playgrounds"
-                onClick={closeMobileMenu}
-                className={`
-                   px-4 py-3 rounded-md text-base font-medium transition-colors
-                  min-h-touch flex items-center
-                  ${
-                    location.pathname === "/playgrounds"
-                      ? "text-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                      : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-neutral-800"
-                  }
-                `}
-              >
-                Playgrounds
-              </Link>
-
-              {/* Mobile Custom Actions */}
-              {customActions && (
-                <div className="px-3 py-2">{customActions}</div>
-              )}
+            <div className="py-3 space-y-1">
+              {navItems.map((item) => {
+                const active = location.pathname === item.to;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={closeMobileMenu}
+                    className={`
+                      flex items-center px-4 py-3 rounded-lg text-base font-medium min-h-touch transition-colors
+                      ${
+                        active
+                          ? "bg-mustard/15 text-ink dark:text-paper"
+                          : "text-ink/70 dark:text-paper/70 hover:bg-ink/5 dark:hover:bg-paper/5"
+                      }
+                    `}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+              {customActions && <div className="px-4 pt-2">{customActions}</div>}
             </div>
           </div>
         )}
@@ -263,5 +172,51 @@ const Header = ({ customActions = null, className = "" }) => {
     </header>
   );
 };
+
+const ThemeToggle = ({ isDark, onToggle }) => (
+  <button
+    onClick={onToggle}
+    title={isDark ? "Switch to light" : "Switch to dark"}
+    aria-label="Toggle color theme"
+    className="
+      relative inline-flex items-center justify-center w-10 h-10 rounded-lg
+      text-ink/70 dark:text-paper/70 hover:text-ink dark:hover:text-paper
+      hover:bg-ink/5 dark:hover:bg-paper/5
+      transition-all duration-200
+      focus:outline-none focus-visible:ring-2 focus-visible:ring-mustard
+    "
+  >
+    <svg
+      className={`absolute w-5 h-5 transition-all duration-300 ${
+        isDark ? "rotate-90 opacity-0 scale-50" : "rotate-0 opacity-100 scale-100"
+      }`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      viewBox="0 0 24 24"
+    >
+      <circle cx="12" cy="12" r="4" />
+      <path
+        strokeLinecap="round"
+        d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M5.6 5.6l1 1M17.4 17.4l1 1M5.6 18.4l1-1M17.4 6.6l1-1"
+      />
+    </svg>
+    <svg
+      className={`absolute w-5 h-5 transition-all duration-300 ${
+        isDark ? "rotate-0 opacity-100 scale-100" : "-rotate-90 opacity-0 scale-50"
+      }`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"
+      />
+    </svg>
+  </button>
+);
 
 export default Header;

@@ -102,14 +102,14 @@ function Playgrounds() {
   };
 
   return (
-    <AppLayout className="bg-slate-50 dark:bg-slate-900">
+    <AppLayout className="bg-paper dark:bg-ink-800">
       {modal.clicked && <Modal modal={modal} toggle={toggle} />}
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl shadow-sm dark:bg-red-900/20 dark:border-red-800 dark:text-red-400">
+        <div className="mb-6 p-4 bg-signal-50 border border-signal-100 text-signal-500 rounded-xl shadow-soft dark:bg-signal/10 dark:border-signal/30 dark:text-signal-200">
           <div className="flex items-start gap-3">
             <svg
-              className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0"
+              className="w-5 h-5 text-signal mt-0.5 flex-shrink-0"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

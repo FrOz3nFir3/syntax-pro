@@ -25,7 +25,7 @@ const AppLayout = ({
 
   return (
     <div
-      className={`app-layout dark:bg-gray-900 min-h-screen transition-colors duration-300 overflow-x-hidden ${className}`}
+      className={`app-layout bg-paper dark:bg-ink-800 min-h-screen transition-colors duration-300 overflow-x-hidden ${className}`}
       data-breakpoint={currentBreakpoint}
       data-touch={isTouchDevice}
     >

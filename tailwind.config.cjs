@@ -11,6 +11,107 @@ module.exports = {
       "2xl": "1536px",
     },
     extend: {
+      opacity: {
+        2: "0.02",
+        3: "0.03",
+        4: "0.04",
+        6: "0.06",
+        8: "0.08",
+        12: "0.12",
+        15: "0.15",
+        18: "0.18",
+        22: "0.22",
+        35: "0.35",
+        45: "0.45",
+        55: "0.55",
+        65: "0.65",
+        85: "0.85",
+      },
+      colors: {
+        // Bracket design system — drawn from the Syntax Pro logo
+        ink: {
+          DEFAULT: "#0B1733",
+          50: "#F2F4F8",
+          100: "#D9DEE8",
+          200: "#A8B2C7",
+          300: "#7686A4",
+          400: "#4D5E80",
+          500: "#2A3656",
+          600: "#1A2444",
+          700: "#0F1A38",
+          800: "#0B1733",
+          900: "#070F22",
+        },
+        paper: {
+          DEFAULT: "#FAF7F0",
+          50: "#FFFEFB",
+          100: "#FAF7F0",
+          200: "#F2EDE0",
+          300: "#E6DFCC",
+          400: "#D2C7AC",
+        },
+        bone: "#F2EDE0",
+        mustard: {
+          DEFAULT: "#F5C518",
+          50: "#FFFAE0",
+          100: "#FDF1B5",
+          200: "#FBE383",
+          300: "#F8D24E",
+          400: "#F5C518",
+          500: "#D9A906",
+          600: "#A8830A",
+          700: "#7A5F0B",
+        },
+        signal: {
+          DEFAULT: "#E63946",
+          50: "#FDECEE",
+          100: "#FAC8CD",
+          200: "#F49199",
+          300: "#EE5B66",
+          400: "#E63946",
+          500: "#C82532",
+          600: "#9B1C26",
+        },
+        mint: {
+          DEFAULT: "#A7E0C7",
+          50: "#EFFAF4",
+          100: "#D5F0E3",
+          200: "#A7E0C7",
+          300: "#74CDA7",
+          400: "#48B886",
+        },
+        graphite: "#2A2F3A",
+      },
+      fontFamily: {
+        display: ['"Instrument Serif"', "Georgia", "serif"],
+        sans: [
+          "Inter",
+          "system-ui",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "Segoe UI",
+          "Roboto",
+          "sans-serif",
+        ],
+        mono: [
+          '"JetBrains Mono"',
+          "Monaco",
+          '"Cascadia Code"',
+          "Consolas",
+          "monospace",
+        ],
+      },
+      letterSpacing: {
+        tightest: "-0.04em",
+      },
+      boxShadow: {
+        soft: "0 1px 2px rgba(11,23,51,0.04), 0 8px 24px -8px rgba(11,23,51,0.08)",
+        lift: "0 2px 4px rgba(11,23,51,0.06), 0 20px 40px -20px rgba(11,23,51,0.18)",
+        press:
+          "inset 0 1px 0 rgba(255,255,255,0.45), 0 1px 0 rgba(11,23,51,0.08), 0 6px 12px -6px rgba(245,197,24,0.55)",
+        "press-dark":
+          "inset 0 1px 0 rgba(255,255,255,0.12), 0 1px 0 rgba(0,0,0,0.4), 0 6px 12px -6px rgba(245,197,24,0.4)",
+      },
       animation: {
         "slide-in-right": "slideInRight 0.3s ease-out",
         "slide-out-right": "slideOutRight 0.3s ease-in",
@@ -25,9 +126,12 @@ module.exports = {
         "bounce-in": "bounceIn 0.4s ease-out",
         shake: "shake 0.5s ease-in-out",
         "pulse-slow": "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-        float: "float 3s ease-in-out infinite",
+        float: "float 6s ease-in-out infinite",
         glow: "glow 2s ease-in-out infinite alternate",
         shimmer: "shimmer 2s linear infinite",
+        marquee: "marquee 40s linear infinite",
+        "frame-in": "frameIn 0.5s cubic-bezier(0.2, 0.9, 0.3, 1) both",
+        blink: "blink 1.1s steps(2, start) infinite",
       },
       keyframes: {
         slideInRight: {
@@ -83,15 +187,27 @@ module.exports = {
         },
         float: {
           "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-10px)" },
+          "50%": { transform: "translateY(-8px)" },
         },
         glow: {
-          "0%": { boxShadow: "0 0 5px rgba(59, 130, 246, 0.5)" },
-          "100%": { boxShadow: "0 0 20px rgba(59, 130, 246, 0.8)" },
+          "0%": { boxShadow: "0 0 5px rgba(245, 197, 24, 0.45)" },
+          "100%": { boxShadow: "0 0 22px rgba(245, 197, 24, 0.75)" },
         },
         shimmer: {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
+        },
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+        frameIn: {
+          "0%": { opacity: "0", transform: "scale(0.85)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
+        },
+        blink: {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0" },
         },
       },
       spacing: {
@@ -100,20 +216,10 @@ module.exports = {
         128: "32rem",
       },
       minHeight: {
-        touch: "44px", // Minimum touch target size
+        touch: "44px",
       },
       minWidth: {
-        touch: "44px", // Minimum touch target size
-      },
-      fontSize: {
-        xs: ["0.75rem", { lineHeight: "1rem" }],
-        sm: ["0.875rem", { lineHeight: "1.25rem" }],
-        base: ["1rem", { lineHeight: "1.5rem" }],
-        lg: ["1.125rem", { lineHeight: "1.75rem" }],
-        xl: ["1.25rem", { lineHeight: "1.75rem" }],
-        "2xl": ["1.5rem", { lineHeight: "2rem" }],
-        "3xl": ["1.875rem", { lineHeight: "2.25rem" }],
-        "4xl": ["2.25rem", { lineHeight: "2.5rem" }],
+        touch: "44px",
       },
     },
   },

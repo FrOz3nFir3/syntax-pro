@@ -48,45 +48,40 @@ const Button = ({
 
   const variantClasses = {
     primary: `
-      bg-gradient-to-r from-blue-800 to-blue-600 text-white focus:ring-blue-500
+      bg-mustard text-ink border border-mustard-500 shadow-press
+      focus:ring-ink dark:focus:ring-paper
       ${
         hasHover
-          ? "hover:from-blue-900 hover:to-blue-700 hover:shadow-lg hover:shadow-blue-500/25 hover:-translate-y-0.5"
-          : "active:from-blue-900 active:to-blue-700"
+          ? "hover:bg-mustard-300 hover:shadow-lift hover:-translate-y-0.5"
+          : "active:bg-mustard-300"
       }
-      before:absolute before:inset-0 before:bg-white before:opacity-0 before:transition-opacity before:duration-200
-      hover:before:opacity-10
     `,
     secondary: `
-      bg-gray-100 text-gray-900 border border-gray-300 focus:ring-gray-500
-      dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600
+      bg-paper-50 text-ink border border-ink/15 shadow-soft
+      dark:bg-ink-700 dark:text-paper dark:border-paper/15
+      focus:ring-ink dark:focus:ring-paper
       ${
         hasHover
-          ? "hover:bg-gray-200 dark:hover:bg-gray-700 hover:shadow-md hover:-translate-y-0.5"
-          : "active:bg-gray-200 dark:active:bg-gray-700"
+          ? "hover:bg-paper hover:border-ink/35 dark:hover:bg-ink-600 dark:hover:border-paper/35 hover:-translate-y-0.5"
+          : "active:bg-paper-200 dark:active:bg-ink-600"
       }
-      before:absolute before:inset-0 before:bg-gray-900 before:opacity-0 before:transition-opacity before:duration-200
-      hover:before:opacity-5 dark:before:bg-white dark:hover:before:opacity-10
     `,
     danger: `
-      bg-red-600 text-white focus:ring-red-500
+      bg-signal text-paper border border-signal-500 shadow-soft
+      focus:ring-signal
       ${
         hasHover
-          ? "hover:bg-red-700 hover:shadow-lg hover:shadow-red-500/25 hover:-translate-y-0.5"
-          : "active:bg-red-700"
+          ? "hover:bg-signal-500 hover:shadow-lift hover:-translate-y-0.5"
+          : "active:bg-signal-500"
       }
-      before:absolute before:inset-0 before:bg-white before:opacity-0 before:transition-opacity before:duration-200
-      hover:before:opacity-10
     `,
     ghost: `
-      text-gray-700 dark:text-gray-300 focus:ring-gray-500
+      text-ink/75 dark:text-paper/75 focus:ring-ink/30 dark:focus:ring-paper/30
       ${
         hasHover
-          ? "hover:bg-gray-100 dark:hover:bg-gray-800 hover:shadow-sm"
-          : "active:bg-gray-100 dark:active:bg-gray-800"
+          ? "hover:bg-ink/5 hover:text-ink dark:hover:bg-paper/5 dark:hover:text-paper"
+          : "active:bg-ink/5 dark:active:bg-paper/5"
       }
-      before:absolute before:inset-0 before:bg-gray-900 before:opacity-0 before:transition-opacity before:duration-200
-      hover:before:opacity-5 dark:before:bg-white dark:hover:before:opacity-5
     `,
   };
 

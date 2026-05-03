@@ -21,16 +21,14 @@ function Modal(props) {
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      {/* Backdrop overlay */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+        className="fixed inset-0 bg-ink/60 dark:bg-ink-900/70 backdrop-blur-sm transition-opacity"
         onClick={toggle}
       ></div>
 
-      {/* Modal container */}
       <div className="flex min-h-full items-center justify-center p-4">
         <div
-          className="relative w-full max-w-md transform overflow-visible rounded-2xl bg-white dark:bg-slate-900 shadow-2xl transition-all"
+          className="relative w-full max-w-md transform overflow-visible rounded-2xl bg-paper dark:bg-ink-700 border border-ink/10 dark:border-paper/10 shadow-lift transition-all"
           onClick={(e) => {
             e.stopPropagation();
           }}

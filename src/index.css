@@ -1,169 +1,184 @@
-/* Import fonts first */
+/* Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap");
 
-/* Import accessibility styles */
 @import "./styles/accessibility.css";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-  .line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-}
-
+/* ───────────────────────── Base ───────────────────────── */
 @layer base {
-  /* Base typography and layout */
+  :root {
+    --bracket-grain-opacity: 0.035;
+  }
+
   html {
     font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
       "Segoe UI", Roboto, sans-serif;
-    @apply antialiased;
-  }
-
-  body {
-    @apply bg-gray-50 text-gray-900 leading-normal;
-  }
-
-  /* Code elements */
-  code,
-  pre {
-    font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
-  }
-
-  /* Ripple animation for micro-interactions */
-  @keyframes ripple {
-    to {
-      transform: scale(4);
-      opacity: 0;
-    }
-  }
-
-  /* Enhanced focus styles */
-  .focus-visible {
-    @apply outline-none ring-2 ring-blue-500 ring-offset-2;
-  }
-
-  /* Smooth scrolling */
-  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
     scroll-behavior: smooth;
   }
 
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+  body {
+    @apply bg-paper text-ink leading-normal;
+    background-image: radial-gradient(
+        circle at 1px 1px,
+        rgba(11, 23, 51, 0.04) 1px,
+        transparent 0
+      );
+    background-size: 22px 22px;
   }
 
-  ::-webkit-scrollbar-track {
-    @apply bg-gray-100 dark:bg-gray-800;
+  html.dark body {
+    @apply bg-ink-800 text-paper;
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      rgba(250, 247, 240, 0.04) 1px,
+      transparent 0
+    );
   }
 
-  ::-webkit-scrollbar-thumb {
-    @apply bg-gray-300 dark:bg-gray-600 rounded-full;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-400 dark:bg-gray-500;
-  }
   code,
-  pre {
-    font-family: "JetBrains Mono", Monaco, "Cascadia Code", "Segoe UI Mono",
-      "Roboto Mono", monospace;
+  pre,
+  kbd,
+  samp {
+    font-family: "JetBrains Mono", Monaco, "Cascadia Code", monospace;
+  }
+
+  ::selection {
+    @apply bg-mustard text-ink;
+  }
+
+  /* Scrollbars */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-paper-200;
+  }
+  html.dark ::-webkit-scrollbar-track {
+    @apply bg-ink-700;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-ink/15 rounded-full border-2 border-paper-200;
+  }
+  html.dark ::-webkit-scrollbar-thumb {
+    @apply bg-paper/15 border-ink-700;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-ink/30;
+  }
+  html.dark ::-webkit-scrollbar-thumb:hover {
+    @apply bg-paper/30;
   }
 }
 
+/* ───────────────────────── Components ───────────────────────── */
 @layer components {
-  /* Button Components */
+  /* ── Buttons ─────────────────────────── */
   .btn-primary {
-    @apply bg-blue-600 hover:bg-blue-700 active:bg-blue-800 
-           text-white font-medium py-2.5 px-4 rounded-lg 
-           transition-colors duration-200 ease-in-out
-           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-           disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 font-medium
+           bg-ink text-paper px-5 py-2.5 rounded-xl
+           border border-ink hover:bg-ink-700
+           shadow-soft hover:shadow-lift
+           transition-all duration-200 ease-out
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-mustard focus-visible:ring-offset-2 focus-visible:ring-offset-paper
+           disabled:opacity-50 disabled:cursor-not-allowed
+           dark:bg-paper dark:text-ink dark:border-paper dark:hover:bg-paper-200
+           dark:focus-visible:ring-offset-ink-800;
   }
 
   .btn-secondary {
-    @apply bg-amber-500 hover:bg-amber-600 active:bg-amber-700
-           text-white font-medium py-2.5 px-4 rounded-lg
-           transition-colors duration-200 ease-in-out
-           focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2
-           disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 font-semibold
+           bg-mustard text-ink px-5 py-2.5 rounded-xl
+           border border-mustard-500
+           shadow-press hover:shadow-lift
+           hover:-translate-y-px active:translate-y-0
+           hover:bg-mustard-300
+           transition-all duration-200 ease-out
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-paper
+           disabled:opacity-50 disabled:cursor-not-allowed
+           dark:shadow-press-dark dark:focus-visible:ring-paper dark:focus-visible:ring-offset-ink-800;
   }
 
   .btn-outline {
-    @apply border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white
-           font-medium py-2 px-4 rounded-lg
-           transition-all duration-200 ease-in-out
-           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-           disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 font-medium
+           bg-transparent text-ink px-5 py-2.5 rounded-xl
+           border border-ink/20 hover:border-ink hover:bg-ink/5
+           transition-all duration-200 ease-out
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2
+           disabled:opacity-50 disabled:cursor-not-allowed
+           dark:text-paper dark:border-paper/20 dark:hover:border-paper dark:hover:bg-paper/5
+           dark:focus-visible:ring-paper dark:focus-visible:ring-offset-ink-800;
   }
 
   .btn-ghost {
-    @apply text-gray-600 hover:text-gray-900 hover:bg-gray-100
-           font-medium py-2 px-4 rounded-lg
-           transition-all duration-200 ease-in-out
-           focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2
-           disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 font-medium
+           text-ink/70 hover:text-ink px-4 py-2 rounded-lg
+           hover:bg-ink/5 transition-all duration-200
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/30
+           disabled:opacity-50
+           dark:text-paper/70 dark:hover:text-paper dark:hover:bg-paper/5;
   }
 
   .btn-danger {
-    @apply bg-red-600 hover:bg-red-700 active:bg-red-800
-           text-white font-medium py-2.5 px-4 rounded-lg
-           transition-colors duration-200 ease-in-out
-           focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2
-           disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 font-medium
+           bg-signal text-paper px-5 py-2.5 rounded-xl
+           border border-signal-500 shadow-soft hover:shadow-lift hover:bg-signal-500
+           transition-all duration-200
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-signal focus-visible:ring-offset-2
+           disabled:opacity-50 disabled:cursor-not-allowed
+           dark:focus-visible:ring-offset-ink-800;
   }
 
-  /* Legacy button for backward compatibility */
   .btn-gold {
     @apply btn-secondary;
   }
 
-  /* Input Components */
+  /* ── Inputs ─────────────────────────── */
   .input-primary {
-    @apply border-2 border-gray-300 dark:border-neutral-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200
-           px-3 py-2 rounded-lg text-gray-900 dark:text-neutral-100 placeholder-gray-500 dark:placeholder-neutral-400
-           bg-white dark:bg-neutral-800
-           transition-all duration-200 ease-in-out
-           focus:outline-none
-           disabled:bg-gray-100 dark:disabled:bg-neutral-700 disabled:cursor-not-allowed;
+    @apply w-full bg-paper-50 text-ink placeholder-ink/40
+           border border-ink/20 rounded-xl px-4 py-2.5
+           shadow-[inset_0_1px_0_rgba(11,23,51,0.04)]
+           transition-all duration-200
+           focus:outline-none focus:border-ink focus:ring-2 focus:ring-mustard/40
+           disabled:bg-paper-200 disabled:cursor-not-allowed
+           dark:bg-ink-800 dark:text-paper dark:placeholder-paper/40
+           dark:border-paper/20 dark:shadow-none
+           dark:focus:border-paper dark:focus:ring-mustard/40;
   }
 
   .input-error {
-    @apply border-2 border-red-500 focus:border-red-600 focus:ring-2 focus:ring-red-200
-           px-3 py-2 rounded-lg text-gray-900 placeholder-gray-500
-           transition-all duration-200 ease-in-out
-           focus:outline-none;
+    @apply input-primary border-signal focus:border-signal focus:ring-signal/30;
   }
 
   .input-success {
-    @apply border-2 border-green-500 focus:border-green-600 focus:ring-2 focus:ring-green-200
-           px-3 py-2 rounded-lg text-gray-900 placeholder-gray-500
-           transition-all duration-200 ease-in-out
-           focus:outline-none;
+    @apply input-primary border-mint-400 focus:border-mint-400 focus:ring-mint/40;
   }
 
-  /* Card Components */
+  /* ── Cards ──────────────────────────── */
   .card {
-    @apply bg-white dark:bg-neutral-800 rounded-xl shadow-md border border-gray-200 dark:border-neutral-700
-           transition-all duration-200 ease-in-out;
+    @apply bg-paper-50 rounded-2xl border border-ink/10 shadow-soft
+           transition-all duration-300 ease-out
+           dark:bg-ink-700 dark:border-paper/10;
   }
 
   .card-hover {
-    @apply card hover:shadow-lg hover:scale-[1.02] cursor-pointer;
+    @apply card hover:shadow-lift hover:-translate-y-0.5 hover:border-ink/25
+           dark:hover:border-paper/25 cursor-pointer;
   }
 
   .card-interactive {
-    @apply card-hover focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2;
+    @apply card-hover focus-within:ring-2 focus-within:ring-mustard focus-within:ring-offset-2;
   }
 
-  /* Layout Components */
+  /* ── Layout ─────────────────────────── */
   .container-responsive {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
@@ -172,123 +187,133 @@
     @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
   }
 
-  /* Typography Components */
+  /* ── Typography ─────────────────────── */
+  .heading-display {
+    @apply font-display font-normal tracking-tightest leading-[0.95];
+    text-wrap: balance;
+  }
+
   .heading-1 {
-    @apply text-4xl font-bold text-gray-900 leading-tight;
+    @apply heading-display text-5xl sm:text-6xl text-ink dark:text-paper;
   }
 
   .heading-2 {
-    @apply text-2xl font-semibold text-gray-900 leading-tight;
+    @apply heading-display text-4xl text-ink dark:text-paper;
   }
 
   .heading-3 {
-    @apply text-xl font-semibold text-gray-900 leading-tight;
+    @apply font-semibold text-2xl text-ink dark:text-paper tracking-tight;
   }
 
   .text-body {
-    @apply text-base text-gray-700 leading-relaxed;
+    @apply text-base text-ink/75 dark:text-paper/75 leading-relaxed;
   }
 
   .text-caption {
-    @apply text-sm text-gray-500;
+    @apply text-sm text-ink/55 dark:text-paper/55;
   }
 
-  /* Loading Components */
+  .eyebrow {
+    @apply font-mono text-xs uppercase tracking-[0.18em] text-ink/55 dark:text-paper/55;
+  }
+
+  /* ── Loading ────────────────────────── */
   .loading-spinner {
-    @apply animate-spin rounded-full border-2 border-gray-300 border-t-blue-600;
+    @apply animate-spin rounded-full border-2 border-ink/20 border-t-mustard;
   }
 
   .loading-pulse {
-    @apply animate-pulse bg-gray-200 rounded;
+    @apply animate-pulse bg-ink/10 dark:bg-paper/10 rounded;
   }
 
-  /* Status Components */
+  /* ── Status pills ───────────────────── */
   .status-success {
-    @apply bg-green-100 text-green-800 border border-green-200 px-3 py-1 rounded-full text-sm font-medium;
+    @apply inline-flex items-center gap-1.5 bg-mint-100 text-mint-400 border border-mint-200
+           px-3 py-1 rounded-full text-xs font-medium
+           dark:bg-mint-400/15 dark:text-mint-200 dark:border-mint-400/30;
   }
 
   .status-warning {
-    @apply bg-yellow-100 text-yellow-800 border border-yellow-200 px-3 py-1 rounded-full text-sm font-medium;
+    @apply inline-flex items-center gap-1.5 bg-mustard-50 text-mustard-700 border border-mustard-200
+           px-3 py-1 rounded-full text-xs font-medium
+           dark:bg-mustard/15 dark:text-mustard-200 dark:border-mustard/30;
   }
 
   .status-error {
-    @apply bg-red-100 text-red-800 border border-red-200 px-3 py-1 rounded-full text-sm font-medium;
+    @apply inline-flex items-center gap-1.5 bg-signal-50 text-signal-500 border border-signal-100
+           px-3 py-1 rounded-full text-xs font-medium
+           dark:bg-signal/15 dark:text-signal-200 dark:border-signal/30;
   }
 
-  /* Navigation Components */
+  /* ── Nav ────────────────────────────── */
   .nav-link {
-    @apply text-gray-600 hover:text-blue-600 font-medium
-           transition-colors duration-200 ease-in-out
-           focus:outline-none focus:text-blue-600;
+    @apply relative font-medium text-sm text-ink/65 hover:text-ink
+           transition-colors duration-200
+           dark:text-paper/65 dark:hover:text-paper;
   }
 
   .nav-link-active {
-    @apply nav-link text-blue-600 font-semibold;
+    @apply nav-link text-ink dark:text-paper;
+  }
+  .nav-link-active::after {
+    content: "";
+    @apply absolute -bottom-1.5 left-0 right-0 h-px bg-signal;
   }
 
-  /* Form Components */
+  /* ── Form ───────────────────────────── */
   .form-group {
     @apply space-y-2;
   }
-
   .form-label {
-    @apply block text-sm font-medium text-gray-700;
+    @apply block text-sm font-medium text-ink/80 dark:text-paper/80;
   }
-
   .form-error {
-    @apply text-sm text-red-600 mt-1;
+    @apply text-sm text-signal-500 mt-1;
   }
-
   .form-help {
-    @apply text-sm text-gray-500 mt-1;
+    @apply text-sm text-ink/50 dark:text-paper/50 mt-1;
   }
 }
 
+/* ───────────────────────── Utilities ───────────────────────── */
 @layer utilities {
-  /* Custom utilities */
-  .text-gradient {
-    @apply bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent;
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
-  .bg-gradient-primary {
-    @apply bg-gradient-to-r from-blue-600 to-blue-800;
+  .text-balance {
+    text-wrap: balance;
   }
 
-  .bg-gradient-secondary {
-    @apply bg-gradient-to-r from-amber-500 to-amber-700;
+  .text-gradient-bracket {
+    @apply bg-gradient-to-br from-ink via-ink-700 to-mustard-500 bg-clip-text text-transparent;
   }
 
-  /* Scrollbar styling */
+  .bg-grain {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='1'/></svg>");
+    background-size: 160px 160px;
+    opacity: var(--bracket-grain-opacity);
+    mix-blend-mode: multiply;
+  }
+
+  /* Scrollbar variants */
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: theme("colors.gray.400") theme("colors.gray.100");
   }
-
   .scrollbar-thin::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
-
-  .scrollbar-thin::-webkit-scrollbar-track {
-    @apply bg-gray-100;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    @apply bg-gray-400 rounded-full;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-500;
-  }
 }
 
-/* Legacy textarea styles - maintained for compatibility */
+/* Legacy textarea reset */
 textarea {
   border: none;
   overflow: auto;
   outline: none;
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
   box-shadow: none;
   resize: none;
 }

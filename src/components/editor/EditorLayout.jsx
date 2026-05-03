@@ -176,24 +176,24 @@ const EditorLayout = memo(
     const layoutClasses = layout === "vertical" ? "flex-col" : "flex-row";
     const resizeHandleClasses =
       layout === "vertical"
-        ? "h-1 w-full cursor-row-resize hover:bg-blue-500 dark:hover:bg-blue-400"
-        : "w-1 h-full cursor-col-resize hover:bg-blue-500 dark:hover:bg-blue-400";
+        ? "h-1 w-full cursor-row-resize hover:bg-mustard dark:hover:bg-mustard"
+        : "w-1 h-full cursor-col-resize hover:bg-mustard dark:hover:bg-mustard";
 
     return (
       <div
         ref={containerRef}
-        className={`flex ${layoutClasses} h-full bg-gray-50 dark:bg-slate-900 ${className} overflow-hidden`}
+        className={`flex ${layoutClasses} h-full bg-paper-50 dark:bg-ink-700 ${className} overflow-hidden`}
         data-layout={layout}
         data-breakpoint={currentBreakpoint}
       >
         {/* Left Panel (Code Editor) */}
         <div
           className={`
-          relative flex flex-col bg-white dark:bg-slate-900 transition-all duration-300 ease-in-out
+          relative flex flex-col bg-paper dark:bg-ink-700 transition-all duration-300 ease-in-out
           ${
             layout === "vertical"
-              ? "border-b border-gray-200 dark:border-neutral-700"
-              : "border-r border-gray-200 dark:border-neutral-700"
+              ? "border-b border-ink/10 dark:border-paper/10"
+              : "border-r border-ink/10 dark:border-paper/10"
           }
         `}
           style={getLeftPanelStyle()}
@@ -201,13 +201,9 @@ const EditorLayout = memo(
           {!isLeftCollapsed && (
             <>
               {/* Left Panel Header */}
-              <div className="flex items-center justify-between px-2 sm:px-4 py-2 bg-gray-50 dark:bg-slate-900 border-b border-gray-200 dark:border-neutral-600">
-                <h3
-                  className={`font-medium text-gray-700 dark:text-gray-300 ${
-                    isSmallScreen ? "text-base" : "text-sm"
-                  }`}
-                >
-                  Code Editor
+              <div className="flex items-center justify-between px-2 sm:px-4 py-2 bg-paper-50 dark:bg-ink-700 border-b border-ink/10 dark:border-paper/10">
+                <h3 className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink/55 dark:text-paper/55">
+                  editor
                 </h3>
                 <div className="flex items-center space-x-1">
                   {onFullscreenToggle && (
@@ -215,7 +211,7 @@ const EditorLayout = memo(
                       onClick={onFullscreenToggle}
                       className={`
                       ${isTouchDevice ? touchClasses.iconButton : "p-1"} 
-                      text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 
+                      text-ink/55 hover:text-ink dark:text-paper/55 dark:hover:text-paper 
                       transition-colors rounded
                     `}
                       title={
@@ -240,8 +236,8 @@ const EditorLayout = memo(
                     ${isTouchDevice ? touchClasses.iconButton : "p-1"} 
                     ${
                       isRightCollapsed
-                        ? "text-gray-300 dark:text-gray-600 cursor-not-allowed"
-                        : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                        ? "text-ink/25 dark:text-paper/25 cursor-not-allowed"
+                        : "text-ink/55 hover:text-ink dark:text-paper/55 dark:hover:text-paper"
                     }
                     transition-colors rounded
                   `}
@@ -273,7 +269,7 @@ const EditorLayout = memo(
                 layout === "vertical"
                   ? "top-4 left-1/2 transform -translate-x-1/2"
                   : "top-1/2 left-0 transform -translate-y-1/2"
-              } bg-blue-600 hover:bg-blue-700 text-white p-2 ${
+              } bg-mustard hover:bg-mustard-300 text-ink p-2 ${
                 layout === "vertical" ? "rounded-b-md" : "rounded-r-md"
               } shadow-lg transition-colors z-10`}
               title="Expand Code Editor"
@@ -291,14 +287,14 @@ const EditorLayout = memo(
         {!isLeftCollapsed && !isRightCollapsed && !isSmallScreen && (
           <div
             className={`
-            bg-gray-200 dark:bg-gray-700 transition-colors relative group
+            bg-ink/8 dark:bg-paper/8 transition-colors relative group
             ${resizeHandleClasses}
           `}
             onMouseDown={handleMouseDown}
           >
             <div
               className={`
-            absolute group-hover:bg-blue-500/20
+            absolute group-hover:bg-mustard/40
             ${
               layout === "vertical"
                 ? "inset-x-0 -top-1 -bottom-1"
@@ -311,23 +307,23 @@ const EditorLayout = memo(
 
         {/* Right Panel (Input/Output) */}
         <div
-          className="relative flex flex-col bg-white dark:bg-slate-900 transition-all duration-300 ease-in-out"
+          className="relative flex flex-col bg-paper dark:bg-ink-700 transition-all duration-300 ease-in-out"
           style={getRightPanelStyle()}
         >
           {!isRightCollapsed && (
             <>
               {/* Right Panel Header */}
-              <div className="flex items-center justify-between px-2 sm:px-4 py-2 bg-gray-50 dark:bg-slate-900 border-b border-gray-200 dark:border-neutral-600">
-                <h3 className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Input/Output
+              <div className="flex items-center justify-between px-2 sm:px-4 py-2 bg-paper-50 dark:bg-ink-700 border-b border-ink/10 dark:border-paper/10">
+                <h3 className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink/55 dark:text-paper/55">
+                  i/o
                 </h3>
                 <button
                   onClick={toggleRightPanel}
                   disabled={isLeftCollapsed}
                   className={`p-1 transition-colors ${
                     isLeftCollapsed
-                      ? "text-gray-300 dark:text-gray-600 cursor-not-allowed"
-                      : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                      ? "text-ink/25 dark:text-paper/25 cursor-not-allowed"
+                      : "text-ink/55 hover:text-ink dark:text-paper/55 dark:hover:text-paper"
                   }`}
                   title={
                     isLeftCollapsed
@@ -354,7 +350,7 @@ const EditorLayout = memo(
                 layout === "vertical"
                   ? "bottom-4 left-1/2 transform -translate-x-1/2"
                   : "top-1/2 right-0 transform -translate-y-1/2"
-              } bg-blue-600 hover:bg-blue-700 text-white p-2 ${
+              } bg-mustard hover:bg-mustard-300 text-ink p-2 ${
                 layout === "vertical" ? "rounded-t-md" : "rounded-l-md"
               } shadow-lg transition-colors z-10`}
               title="Expand Input/Output"

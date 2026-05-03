@@ -1,69 +1,86 @@
-import React, {
-  useState,
-  useRef,
-  useCallback,
-  memo,
-  Suspense,
-  lazy,
-} from "react";
+import React, { useState, useRef, useCallback, memo } from "react";
 import {
-  PlusIcon,
-  XMarkIcon,
   DocumentArrowUpIcon,
   DocumentArrowDownIcon,
   ClipboardIcon,
   TrashIcon,
-  EyeIcon,
-  EyeSlashIcon,
   ArrowPathIcon,
 } from "@heroicons/react/24/outline";
+import Skeleton from "../skeletons/Skeleton";
+import { KEY, IS_TOUCH } from "../../utils/platform";
 
-// Lazy load CodeMirror for better performance
-const ReactCodeMirror = lazy(() => import("@uiw/react-codemirror"));
-
-// Loading skeleton for output
 const OutputLoadingSkeleton = () => (
-  <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400 animate-pulse">
-    <ArrowPathIcon className="w-8 h-8 mx-auto mb-4 animate-spin text-blue-500" />
-    <p className="text-sm font-medium">Running your code...</p>
-    <div className="mt-4 space-y-2 w-full max-w-md px-4">
-      <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded"></div>
-      <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded w-3/4"></div>
-      <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded w-1/2"></div>
+  <div className="flex flex-col h-full bg-ink dark:bg-ink-900">
+    {/* spinner header */}
+    <div className="flex items-center justify-center py-6 border-b border-paper/10">
+      <div className="flex items-center gap-3">
+        <div className="relative w-5 h-5">
+          <span className="block w-5 h-5 rounded-full border-2 border-paper/15" />
+          <span className="absolute inset-0 w-5 h-5 rounded-full border-2 border-transparent border-t-mustard animate-spin" />
+        </div>
+        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-mustard">
+          executing
+        </p>
+      </div>
     </div>
+    {/* shimmering output lines so the layout feels stable */}
+    <Skeleton.Group className="flex-1 p-4 space-y-2.5">
+      <Skeleton.Block className="h-3 w-2/3 !bg-paper/15" />
+      <Skeleton.Block className="h-3 w-5/6 !bg-paper/15" />
+      <Skeleton.Block className="h-3 w-1/2 !bg-paper/15" />
+      <Skeleton.Block className="h-3 w-3/4 !bg-paper/15" />
+    </Skeleton.Group>
   </div>
 );
 
-// Loading skeleton for input import
 const InputLoadingSkeleton = () => (
-  <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400 animate-pulse bg-white dark:bg-slate-800">
-    <DocumentArrowUpIcon className="w-8 h-8 mx-auto mb-4 animate-bounce text-green-500" />
-    <p className="text-sm font-medium">Loading file...</p>
-    <div className="mt-4 space-y-2 w-full max-w-md px-4">
-      <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded"></div>
-      <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded w-5/6"></div>
-      <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded w-2/3"></div>
-      <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded w-4/5"></div>
+  <div className="flex flex-col h-full bg-paper dark:bg-ink-700">
+    <div className="flex items-center justify-center py-6">
+      <div className="flex items-center gap-3">
+        <DocumentArrowUpIcon className="w-5 h-5 text-mustard animate-bounce" />
+        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink/65 dark:text-paper/65">
+          reading file
+        </p>
+      </div>
     </div>
+    <Skeleton.Group className="flex-1 px-4 pb-4 space-y-2.5">
+      <Skeleton.Block className="h-3 w-3/4" />
+      <Skeleton.Block className="h-3 w-full" />
+      <Skeleton.Block className="h-3 w-2/3" />
+    </Skeleton.Group>
   </div>
 );
 
-// Lazy load language extensions
-const loadLanguageExtensions = async () => {
-  const [{ json }, { xml }] = await Promise.all([
-    import("@codemirror/lang-json"),
-    import("@codemirror/lang-xml"),
-  ]);
-  return { json, xml };
-};
+const PanelHeader = ({ label, badge, actions }) => (
+  <div className="flex items-center justify-between px-3 sm:px-5 py-2 bg-paper dark:bg-ink-800 border-b border-ink/10 dark:border-paper/10">
+    <div className="flex items-center gap-2.5 min-w-0">
+      <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink/65 dark:text-paper/65">
+        {label}
+      </span>
+      {badge && (
+        <span className="font-mono text-[10px] text-ink/40 dark:text-paper/40">
+          {badge}
+        </span>
+      )}
+    </div>
+    <div className="flex items-center gap-0.5">{actions}</div>
+  </div>
+);
 
-// Lazy load themes
-const loadThemes = async () => {
-  const { githubLight, githubDark } = await import(
-    "@uiw/codemirror-themes-all"
-  );
-  return { githubLight, githubDark };
-};
+const PanelBtn = ({ onClick, title, children, danger, disabled }) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    title={title}
+    className={`p-1.5 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+      danger
+        ? "text-ink/55 hover:text-signal hover:bg-signal/10 dark:text-paper/55 dark:hover:text-signal-200 dark:hover:bg-signal/10"
+        : "text-ink/55 hover:text-ink hover:bg-ink/5 dark:text-paper/55 dark:hover:text-paper dark:hover:bg-paper/5"
+    }`}
+  >
+    {children}
+  </button>
+);
 
 const InputOutputPanels = memo(
   ({
@@ -73,7 +90,6 @@ const InputOutputPanels = memo(
     onInputImport,
     onOutputClear,
     disabled = false,
-    theme = "light",
     className = "",
   }) => {
     const [isImporting, setIsImporting] = useState(false);
@@ -88,39 +104,26 @@ const InputOutputPanels = memo(
 
     const handleFileImport = (event) => {
       const file = event.target.files[0];
-      if (file) {
-        setIsImporting(true);
-        const reader = new FileReader();
-
-        reader.onload = (e) => {
-          try {
-            onInputImport?.(e.target.result, file.name);
-          } catch (error) {
-            console.error("Error importing file:", error);
-          } finally {
-            setIsImporting(false);
-            // Reset the file input so the same file can be selected again
-            if (inputFileRef.current) {
-              inputFileRef.current.value = "";
-            }
-          }
-        };
-
-        reader.onerror = () => {
-          console.error("Error reading file");
+      if (!file) return;
+      setIsImporting(true);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          onInputImport?.(e.target.result, file.name);
+        } finally {
           setIsImporting(false);
-          if (inputFileRef.current) {
-            inputFileRef.current.value = "";
-          }
-        };
-
-        reader.readAsText(file);
-      }
+          if (inputFileRef.current) inputFileRef.current.value = "";
+        }
+      };
+      reader.onerror = () => {
+        setIsImporting(false);
+        if (inputFileRef.current) inputFileRef.current.value = "";
+      };
+      reader.readAsText(file);
     };
 
     const exportOutput = () => {
       if (!output.content) return;
-
       const blob = new Blob([output.content], { type: "text/plain" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -133,81 +136,59 @@ const InputOutputPanels = memo(
     const copyToClipboard = async (content) => {
       try {
         await navigator.clipboard.writeText(content);
-        // Could add toast notification here
       } catch (err) {
-        console.error("Failed to copy to clipboard:", err);
-      }
-    };
-
-    const getLanguageExtension = async (type) => {
-      const extensions = await loadLanguageExtensions();
-      switch (type) {
-        case "json":
-          return extensions.json();
-        case "xml":
-          return extensions.xml();
-        default:
-          return [];
+        console.error("Failed to copy:", err);
       }
     };
 
     const formatTimestamp = (timestamp) => {
       if (!timestamp) return "";
-      return new Date(timestamp).toLocaleTimeString();
+      return new Date(timestamp).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
     };
 
     return (
       <div
-        className={`flex flex-col h-full overflow-hidden ${className} ${
+        className={`flex flex-col h-full overflow-hidden bg-paper-50 dark:bg-ink-700 ${className} ${
           disabled ? "opacity-60 pointer-events-none" : ""
         }`}
       >
-        {/* Input Panel */}
-        <div className="flex-1 flex flex-col border-b border-gray-200 dark:border-gray-600 min-h-0">
-          {/* Input Header */}
-          <div className="flex items-center justify-between px-2 sm:px-4 py-2 bg-gray-50 dark:bg-slate-900 border-b border-gray-200 dark:border-neutral-600">
-            <h3 className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
-              Input
-            </h3>
+        {/* Input */}
+        <div className="flex-1 flex flex-col border-b border-ink/10 dark:border-paper/10 min-h-0">
+          <PanelHeader
+            label="stdin"
+            badge={input ? `${input.length} chars` : "empty"}
+            actions={
+              <>
+                <PanelBtn
+                  onClick={() => inputFileRef.current?.click()}
+                  disabled={disabled || isImporting}
+                  title={isImporting ? "Loading…" : "Import file"}
+                >
+                  {isImporting ? (
+                    <ArrowPathIcon className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <DocumentArrowUpIcon className="w-4 h-4" />
+                  )}
+                </PanelBtn>
+                <PanelBtn onClick={() => copyToClipboard(input)} title="Copy">
+                  <ClipboardIcon className="w-4 h-4" />
+                </PanelBtn>
+                <PanelBtn
+                  onClick={() => onInputChange?.("")}
+                  disabled={disabled || !input}
+                  title="Clear input"
+                  danger
+                >
+                  <TrashIcon className="w-4 h-4" />
+                </PanelBtn>
+              </>
+            }
+          />
 
-            <div className="flex items-center space-x-0.5 sm:space-x-1">
-              <button
-                onClick={() => inputFileRef.current?.click()}
-                disabled={disabled || isImporting}
-                className={`p-1 transition-colors rounded ${
-                  isImporting
-                    ? "text-green-500 cursor-not-allowed"
-                    : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600"
-                } disabled:opacity-50 disabled:cursor-not-allowed`}
-                title={isImporting ? "Loading file..." : "Import File"}
-              >
-                {isImporting ? (
-                  <ArrowPathIcon className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
-                ) : (
-                  <DocumentArrowUpIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-                )}
-              </button>
-
-              <button
-                onClick={() => copyToClipboard(input)}
-                className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
-                title="Copy to Clipboard"
-              >
-                <ClipboardIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-              </button>
-
-              <button
-                onClick={() => onInputChange?.("")}
-                disabled={disabled}
-                className="p-1 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Clear Input"
-              >
-                <TrashIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Input Content */}
           <div className="flex-1 relative overflow-hidden">
             {isImporting ? (
               <InputLoadingSkeleton />
@@ -216,76 +197,59 @@ const InputOutputPanels = memo(
                 value={input}
                 onChange={(e) => handleInputChange(e.target.value)}
                 disabled={disabled}
-                className="w-full h-full p-2 sm:p-3 border-none outline-none resize-none bg-white dark:bg-slate-800 text-gray-900 dark:text-neutral-100 text-sm overflow-y-auto disabled:opacity-60 disabled:cursor-not-allowed"
-                placeholder="Enter your input here..."
+                className="w-full h-full p-4 border-none outline-none resize-none bg-paper dark:bg-ink-700 text-ink dark:text-paper font-mono text-sm leading-relaxed placeholder-ink/30 dark:placeholder-paper/30 disabled:opacity-60 disabled:cursor-not-allowed"
+                placeholder="// stdin — drop a file here or type"
               />
             )}
           </div>
         </div>
 
-        {/* Output Panel */}
+        {/* Output */}
         <div className="flex-1 flex flex-col min-h-0">
-          {/* Output Header */}
-          <div className="flex items-center justify-between px-2 sm:px-4 py-2 bg-gray-50 dark:bg-slate-900 border-b border-gray-200 dark:border-neutral-600">
-            <div className="flex items-center space-x-1 sm:space-x-2 min-w-0 flex-1">
-              <h3 className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
-                Output
-              </h3>
-              {output.timestamp && (
-                <span className="text-xs text-gray-500 dark:text-gray-400 hidden sm:inline">
-                  {formatTimestamp(output.timestamp)}
-                </span>
-              )}
-            </div>
+          <PanelHeader
+            label="stdout"
+            badge={output.timestamp ? formatTimestamp(output.timestamp) : "—"}
+            actions={
+              <>
+                <PanelBtn
+                  onClick={exportOutput}
+                  disabled={!output.content}
+                  title="Export output"
+                >
+                  <DocumentArrowDownIcon className="w-4 h-4" />
+                </PanelBtn>
+                <PanelBtn
+                  onClick={() => copyToClipboard(output.content || "")}
+                  disabled={!output.content}
+                  title="Copy"
+                >
+                  <ClipboardIcon className="w-4 h-4" />
+                </PanelBtn>
+                <PanelBtn
+                  onClick={onOutputClear}
+                  disabled={!output.content}
+                  title="Clear output"
+                  danger
+                >
+                  <TrashIcon className="w-4 h-4" />
+                </PanelBtn>
+              </>
+            }
+          />
 
-            <div className="flex items-center space-x-0.5 sm:space-x-1 flex-shrink-0">
-              <button
-                onClick={exportOutput}
-                className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
-                title="Export Output"
-              >
-                <DocumentArrowDownIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-              </button>
-
-              <button
-                onClick={() => copyToClipboard(output.content || "")}
-                className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
-                title="Copy to Clipboard"
-              >
-                <ClipboardIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-              </button>
-
-              <button
-                onClick={onOutputClear}
-                className="p-1 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
-                title="Clear Output"
-              >
-                <TrashIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Output Content */}
           <div className="flex-1 overflow-hidden">
             {output.isLoading ? (
               <OutputLoadingSkeleton />
             ) : output.content ? (
-              <pre className="w-full h-full p-2 sm:p-3 overflow-y-auto overflow-x-auto bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-neutral-100 text-xs sm:text-sm font-mono whitespace-pre-wrap">
+              <pre className="w-full h-full p-4 overflow-auto bg-ink dark:bg-ink-900 text-paper/95 text-sm font-mono leading-relaxed whitespace-pre-wrap">
                 {output.content}
               </pre>
             ) : (
-              <div className="flex items-center justify-center h-full text-gray-500 dark:bg-slate-800 dark:text-gray-400">
-                <div className="text-center">
-                  <EyeSlashIcon className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                  <p>No output yet</p>
-                  <p className="text-sm">Run your code to see results</p>
-                </div>
-              </div>
+              <EmptyOutputState />
             )}
           </div>
         </div>
 
-        {/* Hidden file input */}
         <input
           ref={inputFileRef}
           type="file"
@@ -296,6 +260,25 @@ const InputOutputPanels = memo(
       </div>
     );
   }
+);
+
+const EmptyOutputState = () => (
+  <div className="flex items-center justify-center h-full bg-paper dark:bg-ink-700 px-6">
+    <div className="text-center max-w-xs">
+      <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink/45 dark:text-paper/45 mb-3">
+        nothing yet
+      </p>
+      <p className="font-display text-2xl text-ink dark:text-paper mb-2 leading-tight">
+        Press <span className="text-mustard">Run</span> to see your output
+        here.
+      </p>
+      {!IS_TOUCH && (
+        <p className="text-xs text-ink/45 dark:text-paper/45 italic mt-3">
+          {KEY.run} also works.
+        </p>
+      )}
+    </div>
+  </div>
 );
 
 InputOutputPanels.displayName = "InputOutputPanels";
